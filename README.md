@@ -1,5 +1,7 @@
 ***Cryptography_Project_AES***
 
+Author : Mathys Decker (Group 15)
+
 Simple AES implementation for a cryptography project
 
 usage: AES [-h] [-E] [-D] [-kr size] [-kb hex] [-kt text] [-dr size] [-dt text] [-df path]\
