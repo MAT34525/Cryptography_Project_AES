@@ -7,11 +7,11 @@ from threading import Thread
 
 class AES :
 
-    def __init__(self) :
+    def __init__(self, sequence : bytearray = None, cipherKey : bytearray = None) :
         """
         Create a new AES object
         """
-
+        
         self.blocks = None
         self.key = None
 
@@ -103,6 +103,9 @@ class AES :
 
         # Convert the sequence to blocks
         self.blocks = AES.SequenceToBlocks(sequence)
+        
+        print("Input file has been loaded from :")
+        print(path)
 
     # <=-=-=-= Load the key =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
@@ -121,20 +124,26 @@ class AES :
         print("Randomly generated key :")
         AES.PrintSequence(self.key.key)
 
-    def UseBytesKey(self, key : list):
+    
+    def UseBytesKey(self, key : str):
         """
         Get the bytes to be used as a key
         'key' - Integer array to be used as a key
         """
+        sequence = []
 
-        if len(key) not in [16, 24, 32]:
+        for elt in key.split(" "):
+
+            sequence.append(int(elt, base = 16))
+
+        if len(sequence) not in [16, 24, 32]:
 
             raise ValueError("The key size is invalid and should be 16, 24 or 32 bytes")
-
-        self.key = Key(key)
+        
+        self.key = Key(sequence)
 
         print("Input key :")
-        AES.PrintSequence(key)
+        AES.PrintSequence(sequence)
 
     def UseTextKey(self, textKey : str):
         """
