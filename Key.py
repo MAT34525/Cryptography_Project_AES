@@ -152,7 +152,7 @@ class Key :
         i = self.Nk
         rconCount = 0
         
-        # Compute the folowing words from the initial words 
+        # Compute the following words from the initial words 
         while i < self.Nb * (self.Nr+1) :
 
             temp = words[i-1]

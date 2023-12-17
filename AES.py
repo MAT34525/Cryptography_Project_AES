@@ -3,26 +3,17 @@ from Block import Block
 from Key import Key
 from random import randbytes
 from tqdm import tqdm
+from threading import Thread
 
 class AES :
 
-    def __init__(self, sequence : bytearray = None, cipherKey : bytearray = None) :
+    def __init__(self) :
         """
         Create a new AES object
-        'sequence' - Sequence of bytes to be ciphered / unciphered
-        'cipherKey' -  Sequence of 16 / 24 / 32 bytes used as a key
         """
 
         self.blocks = None
         self.key = None
-        
-        if sequence != None:
-
-            self.blocks = self.SplitSequenceInBlocks(sequence)
-
-        if cipherKey != None :
-
-            self.Key = Key(cipherKey)
 
     # Static methods & Other =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
             
@@ -227,14 +218,12 @@ class AES :
 
     # <=-=-=-= Encryption / Decryption =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-    def CipherBlock(self, block : Block):
+    def CipherBlock(self, block : Block, keySchedule : list):
         """
         Encrypt a block of 16 bytes using the AES using the key
         'block' - Block to by encrypted
+        'keySchedule' - Pre-calculated key schedule
         """
-
-        # Get the key schedule from the key
-        keySchedule = self.key.KeyExpansion()
 
         # Encrypt the block
         block.AddRoundKey(0, keySchedule)
@@ -260,25 +249,25 @@ class AES :
 
         nBlocks = len(self.blocks)
 
+        keySchedule = self.key.KeyExpansion()
+
         encryptedBlocks = []
 
         # Iteration with progress bar 
         for blockIndex in tqdm(range(nBlocks), desc= "Encrypt blocks...") :
 
             # Encrypt a block
-            encryptedBlocks.append(self.CipherBlock(self.blocks[blockIndex]))
+            encryptedBlocks.append(self.CipherBlock(self.blocks[blockIndex], keySchedule))
 
         self.blocks = encryptedBlocks
 
 
-    def UnCipherBlock(self, block : Block):
+    def UnCipherBlock(self, block : Block, keySchedule : list):
         """
         Decrypt a block of 16 bytes using the AES using the key
         'block' - Block to be decrypted
+        'keySchedule' - Pre-calculated key schedule
         """
-
-        # Get the key schedule from the key
-        keySchedule = self.key.KeyExpansion()
 
         block.AddRoundKey(self.key.Nb, keySchedule)        
 
@@ -303,16 +292,14 @@ class AES :
 
         nBlocks = len(self.blocks)
 
+        keySchedule = self.key.KeyExpansion()
+
         plainBlocks = []
 
         # Iteration with progress bar
         for blockIndex in tqdm(range(nBlocks), desc= "Decrypt blocks...") :
 
             # Decrypt a block
-            plainBlocks.append(self.UnCipherBlock(self.blocks[blockIndex]))
+            plainBlocks.append(self.UnCipherBlock(self.blocks[blockIndex], keySchedule))
 
         self.blocks = plainBlocks
-
-
-
-

@@ -111,18 +111,20 @@ class TestAESMethods(unittest.TestCase):
 
     def test_cipher_block(self):
 
-        keyseq = randbytes(16)
-        sequence = randbytes(16)
-        
-        cipher = AES(sequence, keyseq)
+        cipher = AES()
+
+        cipher.FromRandomByte(16)
+        cipher.UseRandomKey(16)
+
+        keySchedule = cipher.key.KeyExpansion()
 
         blockInit = cipher.blocks[0].block
 
-        cipher.CipherBlock(cipher.blocks[0])
+        cipher.CipherBlock(cipher.blocks[0], keySchedule)
 
         blockSub = cipher.blocks[0].block
 
-        cipher.UnCipherBlock(cipher.blocks[0])
+        cipher.UnCipherBlock(cipher.blocks[0], keySchedule)
 
         blockFinal = cipher.blocks[0].block
 
@@ -135,3 +137,50 @@ class TestAESMethods(unittest.TestCase):
         self.assertNotEqual(blockInit, blockSub)
 
         self.assertEqual(blockInit, blockFinal)
+
+    def test_cipher_large_sequence(self):
+        
+        sequences = [1, 10, 50, 100, 1000, 10000, 100000]
+
+        cipher = AES()
+
+        cipher.UseRandomKey(16)
+
+        for sequence in sequences :
+
+            cipher.FromRandomByte(sequence)
+
+            InitSeq = cipher.BlocksToSequence() 
+
+            cipher.Cipher()
+
+            EncryptedSeq = cipher.BlocksToSequence()
+
+            cipher.UnCipher()
+
+            DecryptedSeq = cipher.BlocksToSequence()
+
+            self.assertNotEqual(InitSeq, EncryptedSeq)
+
+            self.assertEqual(InitSeq, DecryptedSeq)
+
+    def test_cipher_image(self):
+
+        cipher = AES()
+
+        cipher.UseRandomKey(16)
+        cipher.FromFile("InFiles/test.jpg")
+
+        InitSeq = cipher.BlocksToSequence() 
+
+        cipher.Cipher()
+
+        EncryptedSeq = cipher.BlocksToSequence()
+
+        cipher.UnCipher()
+
+        DecryptedSeq = cipher.BlocksToSequence()
+
+        self.assertNotEqual(InitSeq, EncryptedSeq)
+
+        self.assertEqual(InitSeq, DecryptedSeq)
