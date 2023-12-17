@@ -7,7 +7,7 @@ from threading import Thread
 
 class AES :
 
-    def __init__(self, sequence : bytearray = None, cipherKey : bytearray = None) :
+    def __init__(self) :
         """
         Create a new AES object
         """
@@ -124,7 +124,6 @@ class AES :
         print("Randomly generated key :")
         AES.PrintSequence(self.key.key)
 
-    
     def UseBytesKey(self, key : str):
         """
         Get the bytes to be used as a key
